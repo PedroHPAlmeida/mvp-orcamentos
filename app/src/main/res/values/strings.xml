@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">Budgets</string>
+    <string name="customer_plural">Cliente(s):</string>
+    <string name="add_button">ADICIONAR</string>
+    <string name="products_and_services">Produto(s) e Serviço(s):</string>
+    <string name="place_and_date">Local e Data</string>
+    <string name="city_hint">Digite a cidade</string>
+    <string name="budget_details">Detalhes do Orçamento</string>
+    <string name="items_quantity">Quantidade de itens:</string>
+    <string name="total">Total:</string>
+    <string name="generate_budget">GERAR ORÇAMENTO</string>
+    <string name="select_date">Selecione a data</string>
+    <string name="br_date_format">DD/MM/AAAA</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
 </resources>
