@@ -13,4 +13,8 @@
     <string name="br_date_format">DD/MM/AAAA</string>
     <string name="cancel">Cancelar</string>
     <string name="ok">OK</string>
+    <string name="new_budget">Novo Orçamento</string>
+    <string name="my_data">Meus Dados</string>
+    <string name="my_budgets">Meus Orçamentos</string>
+    <string name="in_construction">Em Construção</string>
 </resources>
