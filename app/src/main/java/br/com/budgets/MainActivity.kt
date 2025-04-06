@@ -25,6 +25,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "home") {
                         composable("home") { HomeScreen(navController) }
                         composable("new_budget") { NewBudgetScreen() }
+                        composable("my_budgets") { MyBudgetsScreen() }
                     }
                 }
             }

@@ -17,4 +17,9 @@
     <string name="my_data">Meus Dados</string>
     <string name="my_budgets">Meus Orçamentos</string>
     <string name="in_construction">Em Construção</string>
+    <string name="new_budget_button">NOVO</string>
+    <string name="budget_and_id">Orçamento #%1$s</string>
+    <string name="quantity_prod_and_serv">Quantidade de produtos e serviços:</string>
+    <string name="customer">Cliente:</string>
+    <string name="budget_value">"Valor:"</string>
 </resources>
