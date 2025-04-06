@@ -20,6 +20,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
@@ -49,12 +49,10 @@ import java.util.Locale
 @Preview(showBackground = true)
 @Composable
 fun NewBudgetScreen() {
-    val datePickerState = rememberDatePickerState()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(vertical = 48.dp, horizontal = 16.dp)
     ) {
         Text(
             text = stringResource(R.string.customer_plural),
@@ -76,7 +74,9 @@ fun NewBudgetScreen() {
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = Color.Black, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            thickness = 2.dp
         )
 
         Text(
@@ -99,7 +99,9 @@ fun NewBudgetScreen() {
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = Color.Black, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            thickness = 2.dp
         )
 
         Text(
@@ -121,7 +123,9 @@ fun NewBudgetScreen() {
         DatePickerFieldToModal()
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = Color.Black, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            thickness = 2.dp
         )
 
         Text(
@@ -169,7 +173,7 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
         label = { Text(stringResource(R.string.select_date)) },
         placeholder = { Text(stringResource(R.string.br_date_format)) },
         trailingIcon = {
-            Icon(Icons.Default.DateRange, contentDescription = "Select date")
+            Icon(Icons.Default.DateRange, contentDescription = null)
         },
         modifier = modifier
             .fillMaxWidth()
