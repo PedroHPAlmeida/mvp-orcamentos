@@ -33,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
@@ -50,8 +49,6 @@ import java.util.Locale
 @Preview(showBackground = true)
 @Composable
 fun NewBudgetScreen() {
-    val datePickerState = rememberDatePickerState()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -77,7 +74,9 @@ fun NewBudgetScreen() {
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = MaterialTheme.colorScheme.inverseOnSurface, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            thickness = 2.dp
         )
 
         Text(
@@ -100,7 +99,9 @@ fun NewBudgetScreen() {
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = MaterialTheme.colorScheme.inverseOnSurface, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            thickness = 2.dp
         )
 
         Text(
@@ -122,7 +123,9 @@ fun NewBudgetScreen() {
         DatePickerFieldToModal()
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = MaterialTheme.colorScheme.inverseOnSurface, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp),
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            thickness = 2.dp
         )
 
         Text(
@@ -170,7 +173,7 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
         label = { Text(stringResource(R.string.select_date)) },
         placeholder = { Text(stringResource(R.string.br_date_format)) },
         trailingIcon = {
-            Icon(Icons.Default.DateRange, contentDescription = "Select date")
+            Icon(Icons.Default.DateRange, contentDescription = null)
         },
         modifier = modifier
             .fillMaxWidth()
