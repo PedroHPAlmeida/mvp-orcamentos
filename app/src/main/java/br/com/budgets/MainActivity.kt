@@ -8,6 +8,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import br.com.budgets.ui.theme.BudgetsTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,8 +20,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BudgetsTheme {
+                val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    NewBudgetScreen()
+                    NavHost(navController = navController, startDestination = "home") {
+                        composable("home") { HomeScreen(navController) }
+                        composable("new_budget") { NewBudgetScreen() }
+                    }
                 }
             }
         }
