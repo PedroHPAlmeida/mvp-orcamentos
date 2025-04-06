@@ -20,6 +20,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -76,7 +77,7 @@ fun NewBudgetScreen() {
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = Color.Black, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp), color = MaterialTheme.colorScheme.inverseOnSurface, thickness = 2.dp
         )
 
         Text(
@@ -99,7 +100,7 @@ fun NewBudgetScreen() {
         }
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = Color.Black, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp), color = MaterialTheme.colorScheme.inverseOnSurface, thickness = 2.dp
         )
 
         Text(
@@ -121,7 +122,7 @@ fun NewBudgetScreen() {
         DatePickerFieldToModal()
 
         HorizontalDivider(
-            modifier = Modifier.padding(vertical = 16.dp), color = Color.Black, thickness = 2.dp
+            modifier = Modifier.padding(vertical = 16.dp), color = MaterialTheme.colorScheme.inverseOnSurface, thickness = 2.dp
         )
 
         Text(
