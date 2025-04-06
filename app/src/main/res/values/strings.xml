@@ -22,4 +22,17 @@
     <string name="quantity_prod_and_serv">Quantidade de produtos e serviços:</string>
     <string name="customer">Cliente:</string>
     <string name="budget_value">"Valor:"</string>
+
+    <string name="skip">Pular</string>
+    <string name="name">Nome:</string>
+    <string name="cpf_cnpj">Cpf/Cnpj:</string>
+    <string name="phone">Telefone:</string>
+    <string name="email">E-mail:</string>
+    <string name="address">Endereço:</string>
+    <string name="zip_code">CEP:</string>
+    <string name="address_detail">Endereço:</string>
+    <string name="neighborhood">Bairro:</string>
+    <string name="city">Cidade:</string>
+    <string name="state">Estado:</string>
+    <string name="save">Salvar</string>
 </resources>
