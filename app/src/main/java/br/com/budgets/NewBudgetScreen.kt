@@ -45,10 +45,11 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun NewBudgetScreen() {
+    var showAddProductOrServiceModal by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,7 +64,9 @@ fun NewBudgetScreen() {
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
-            modifier = Modifier.fillMaxWidth(), onClick = {}) {
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { /* Ação para adicionar cliente */ }
+        ) {
             Icon(
                 imageVector = Icons.Default.AddCircle,
                 contentDescription = null,
@@ -88,7 +91,9 @@ fun NewBudgetScreen() {
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
-            modifier = Modifier.fillMaxWidth(), onClick = {}) {
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { showAddProductOrServiceModal = true }
+        ) {
             Icon(
                 imageVector = Icons.Default.AddCircle,
                 contentDescription = null,
@@ -96,6 +101,16 @@ fun NewBudgetScreen() {
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = stringResource(R.string.add_button))
+        }
+
+        if (showAddProductOrServiceModal) {
+            AddProductOrServiceModal(
+                onConfirm = { name, value ->
+                    println("Produto ou Serviço Adicionado: Nome = $name, Valor = $value")
+                    showAddProductOrServiceModal = false
+                },
+                onDismiss = { showAddProductOrServiceModal = false }
+            )
         }
 
         HorizontalDivider(

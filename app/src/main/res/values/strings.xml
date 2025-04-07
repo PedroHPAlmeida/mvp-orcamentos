@@ -22,7 +22,9 @@
     <string name="quantity_prod_and_serv">Quantidade de produtos e serviços:</string>
     <string name="customer">Cliente:</string>
     <string name="budget_value">"Valor:"</string>
-
+    <string name="name_hint">Nome</string>
+    <string name="value_hint">Valor</string>
+    <string name="confirm">Confirmar</string>
     <string name="skip">Pular</string>
     <string name="name">Nome:</string>
     <string name="cpf_cnpj">Cpf/Cnpj:</string>
