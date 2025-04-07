@@ -22,7 +22,8 @@ class MainActivity : ComponentActivity() {
             BudgetsTheme {
                 val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    NavHost(navController = navController, startDestination = "home") {
+                    NavHost(navController = navController, startDestination = "initial_registration") {
+                        composable("initial_registration") { InitialRegistrationScreen(navController) }
                         composable("home") { HomeScreen(navController) }
                         composable("new_budget") { NewBudgetScreen() }
                         composable("my_budgets") { MyBudgetsScreen() }
