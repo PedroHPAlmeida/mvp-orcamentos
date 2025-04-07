@@ -56,7 +56,7 @@ fun HomeScreen(navController: NavController) {
                 modifier = Modifier.weight(1f),
                 icon = Icons.Default.Edit,
                 text = stringResource(R.string.my_data),
-                onClick = { /* Ação para Meus Dados */ }
+                onClick = { navController.navigate("initial_registration") }
             )
         }
 
