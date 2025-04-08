@@ -19,7 +19,8 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun InitialRegistrationScreen(
     navController: NavController,
-    isFromHomeScreen: Boolean = false
+    isFromHomeScreen: Boolean = false,
+    isFromNewBudgetScreen: Boolean = false // Nova variável para identificar a origem
 ) {
     var name by remember { mutableStateOf("") }
     var cpfCnpj by remember { mutableStateOf("") }
@@ -138,7 +139,7 @@ fun InitialRegistrationScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isFromHomeScreen) {
+            if (isFromHomeScreen || isFromNewBudgetScreen) { // Condição ajustada
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -175,7 +176,7 @@ fun InitialRegistrationScreen(
             }
         }
 
-        if (buttonVisibility && !isFromHomeScreen) {
+        if (buttonVisibility && !isFromHomeScreen && !isFromNewBudgetScreen) {
             TextButton(
                 modifier = Modifier
                     .align(Alignment.TopEnd)

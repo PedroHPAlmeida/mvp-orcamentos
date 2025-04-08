@@ -41,13 +41,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBudgetScreen() {
+fun NewBudgetScreen(navController: NavController) {
     var showAddProductOrServiceModal by remember { mutableStateOf(false) }
 
     Column(
@@ -65,7 +67,10 @@ fun NewBudgetScreen() {
 
         OutlinedButton(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { /* Ação para adicionar cliente */ }
+            onClick = {
+                // Navega para a tela de registro inicial e indica que veio da tela de novo orçamento
+                navController.navigate("initial_registration?isFromNewBudgetScreen=true")
+            }
         ) {
             Icon(
                 imageVector = Icons.Default.AddCircle,
@@ -231,7 +236,7 @@ fun DatePickerModal(
         }
     }, dismissButton = {
         TextButton(onClick = onDismiss) {
-            Text(stringResource(R.string.cancel))
+            Text(text = stringResource(R.string.cancel))
         }
     }) {
         DatePicker(state = datePickerState)

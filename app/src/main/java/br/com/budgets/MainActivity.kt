@@ -23,24 +23,34 @@ class MainActivity : ComponentActivity() {
             BudgetsTheme {
                 val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    // TODO: Consider using innerPadding in the future for better layout management
                     NavHost(
                         navController = navController,
                         startDestination = "initial_registration",
                         modifier = Modifier.fillMaxSize()
                     ) {
                         composable(
-                            "initial_registration?isFromHomeScreen={isFromHomeScreen}",
-                            arguments = listOf(navArgument("isFromHomeScreen") {
-                                type = NavType.BoolType
-                                defaultValue = false
-                            })
+                            "initial_registration?isFromHomeScreen={isFromHomeScreen}&isFromNewBudgetScreen={isFromNewBudgetScreen}",
+                            arguments = listOf(
+                                navArgument("isFromHomeScreen") {
+                                    type = NavType.BoolType
+                                    defaultValue = false
+                                },
+                                navArgument("isFromNewBudgetScreen") {
+                                    type = NavType.BoolType
+                                    defaultValue = false
+                                }
+                            )
                         ) { backStackEntry ->
                             val isFromHomeScreen = backStackEntry.arguments?.getBoolean("isFromHomeScreen") ?: false
-                            InitialRegistrationScreen(navController, isFromHomeScreen)
+                            val isFromNewBudgetScreen = backStackEntry.arguments?.getBoolean("isFromNewBudgetScreen") ?: false
+                            InitialRegistrationScreen(
+                                navController = navController,
+                                isFromHomeScreen = isFromHomeScreen,
+                                isFromNewBudgetScreen = isFromNewBudgetScreen
+                            )
                         }
                         composable("home") { HomeScreen(navController) }
-                        composable("new_budget") { NewBudgetScreen() }
+                        composable("new_budget") { NewBudgetScreen(navController) }
                         composable("my_budgets") { MyBudgetsScreen() }
                     }
                 }
