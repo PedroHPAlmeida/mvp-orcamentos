@@ -29,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import br.com.budgets.data.Budget
 
 val budgets = listOf(
@@ -54,9 +56,8 @@ val budgets = listOf(
     Budget(20, "Maria", 1, 50.0),
 )
 
-@Preview(showBackground = true)
 @Composable
-fun MyBudgetsScreen() {
+fun MyBudgetsScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +77,12 @@ fun MyBudgetsScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedButton(
-            modifier = Modifier.fillMaxWidth(), onClick = {}) {
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                // Navega para a tela de novo orçamento
+                navController.navigate("new_budget")
+            }
+        ) {
             Icon(
                 imageVector = Icons.Default.AddCircle,
                 contentDescription = null,
@@ -137,4 +143,10 @@ fun BudgetItem(budget: Budget) {
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MyBudgetsScreenPreview() {
+    MyBudgetsScreen(navController = rememberNavController())
 }

@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("home") { HomeScreen(navController) }
                         composable("new_budget") { NewBudgetScreen(navController) }
-                        composable("my_budgets") { MyBudgetsScreen() }
+                        composable("my_budgets") { MyBudgetsScreen(navController) }
                     }
                 }
             }
