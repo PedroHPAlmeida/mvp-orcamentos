@@ -1,10 +1,29 @@
 package br.com.budgets
 
-import androidx.compose.foundation.layout.*
+import android.net.Uri
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -15,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import br.com.budgets.data.Customer
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun InitialRegistrationScreen(
@@ -54,8 +76,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = name,
                 onValueChange = { name = it },
-                label = { Text(stringResource(R.string.name)) }
-            )
+                label = { Text(stringResource(R.string.name)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -63,8 +84,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = cpfCnpj,
                 onValueChange = { cpfCnpj = it },
-                label = { Text(stringResource(R.string.cpf_cnpj)) }
-            )
+                label = { Text(stringResource(R.string.cpf_cnpj)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -72,8 +92,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = phone,
                 onValueChange = { phone = it },
-                label = { Text(stringResource(R.string.phone)) }
-            )
+                label = { Text(stringResource(R.string.phone)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -81,8 +100,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(stringResource(R.string.email)) }
-            )
+                label = { Text(stringResource(R.string.email)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -98,8 +116,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = cep,
                 onValueChange = { cep = it },
-                label = { Text(stringResource(R.string.zip_code)) }
-            )
+                label = { Text(stringResource(R.string.zip_code)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -107,8 +124,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = addressDetail,
                 onValueChange = { addressDetail = it },
-                label = { Text(stringResource(R.string.address_detail)) }
-            )
+                label = { Text(stringResource(R.string.address_detail)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -116,8 +132,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = neighborhood,
                 onValueChange = { neighborhood = it },
-                label = { Text(stringResource(R.string.neighborhood)) }
-            )
+                label = { Text(stringResource(R.string.neighborhood)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -125,8 +140,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = city,
                 onValueChange = { city = it },
-                label = { Text(stringResource(R.string.city)) }
-            )
+                label = { Text(stringResource(R.string.city)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -134,8 +148,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier.fillMaxWidth(),
                 value = state,
                 onValueChange = { state = it },
-                label = { Text(stringResource(R.string.state)) }
-            )
+                label = { Text(stringResource(R.string.state)) })
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -145,24 +158,33 @@ fun InitialRegistrationScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     OutlinedButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = { navController.navigateUp() }
-                    ) {
+                        modifier = Modifier.weight(1f), onClick = { navController.navigateUp() }) {
                         Text(text = stringResource(R.string.cancel))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = { navController.navigate("home") }
-                    ) {
+                        modifier = Modifier.weight(1f), onClick = {
+                            if (isFromHomeScreen) {
+                                navController.navigate("home")
+                            }
+                            if (isFromNewBudgetScreen) {
+                                val customer = Json.encodeToString(Customer(name, cpfCnpj))
+                                navController.navigate(
+                                    "new_budget?customerJson=${
+                                        Uri.encode(
+                                            customer
+                                        )
+                                    }"
+                                )
+                            }
+                        }) {
                         Text(text = stringResource(R.string.save))
                     }
                 }
             } else {
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { navController.navigate("home") }
-                ) {
+                    onClick = { navController.navigate("home") }) {
                     Text(text = stringResource(R.string.save))
                 }
             }
@@ -181,8 +203,7 @@ fun InitialRegistrationScreen(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(16.dp),
-                onClick = { navController.navigate("home") }
-            ) {
+                onClick = { navController.navigate("home") }) {
                 Text(text = stringResource(R.string.skip), fontSize = 14.sp)
             }
         }

@@ -1,8 +1,13 @@
 package br.com.budgets
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,9 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,24 +39,25 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import br.com.budgets.data.Customer
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBudgetScreen(navController: NavController) {
+fun NewBudgetScreen(navController: NavController, customer: Customer?) {
     var showAddProductOrServiceModal by remember { mutableStateOf(false) }
 
     Column(
@@ -65,20 +73,22 @@ fun NewBudgetScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                // Navega para a tela de registro inicial e indica que veio da tela de novo orçamento
-                navController.navigate("initial_registration?isFromNewBudgetScreen=true")
+        if (customer != null) {
+            CustomerItem(customer)
+        } else {
+            OutlinedButton(
+                modifier = Modifier.fillMaxWidth(), onClick = {
+                    // Navega para a tela de registro inicial e indica que veio da tela de novo orçamento
+                    navController.navigate("initial_registration?isFromNewBudgetScreen=true")
+                }) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = stringResource(R.string.add_button))
             }
-        ) {
-            Icon(
-                imageVector = Icons.Default.AddCircle,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(R.string.add_button))
         }
 
         HorizontalDivider(
@@ -96,9 +106,7 @@ fun NewBudgetScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { showAddProductOrServiceModal = true }
-        ) {
+            modifier = Modifier.fillMaxWidth(), onClick = { showAddProductOrServiceModal = true }) {
             Icon(
                 imageVector = Icons.Default.AddCircle,
                 contentDescription = null,
@@ -109,13 +117,10 @@ fun NewBudgetScreen(navController: NavController) {
         }
 
         if (showAddProductOrServiceModal) {
-            AddProductOrServiceModal(
-                onConfirm = { name, value ->
-                    println("Produto ou Serviço Adicionado: Nome = $name, Valor = $value")
-                    showAddProductOrServiceModal = false
-                },
-                onDismiss = { showAddProductOrServiceModal = false }
-            )
+            AddProductOrServiceModal(onConfirm = { name, value ->
+                println("Produto ou Serviço Adicionado: Nome = $name, Valor = $value")
+                showAddProductOrServiceModal = false
+            }, onDismiss = { showAddProductOrServiceModal = false })
         }
 
         HorizontalDivider(
@@ -240,5 +245,37 @@ fun DatePickerModal(
         }
     }) {
         DatePicker(state = datePickerState)
+    }
+}
+
+@Composable
+fun CustomerItem(customer: Customer) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(15.dp))
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .clickable {}
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Column {
+                Text(text = customer.name, fontWeight = FontWeight.Bold)
+                Text(text = customer.cpfOrCnpj, fontWeight = FontWeight.Bold)
+            }
+
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable {})
+        }
     }
 }

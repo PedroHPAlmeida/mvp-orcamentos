@@ -12,7 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import br.com.budgets.data.Customer
 import br.com.budgets.ui.theme.BudgetsTheme
+import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
     @Suppress("UnusedMaterial3ScaffoldPaddingParameter")
@@ -30,19 +32,19 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(
                             "initial_registration?isFromHomeScreen={isFromHomeScreen}&isFromNewBudgetScreen={isFromNewBudgetScreen}",
-                            arguments = listOf(
-                                navArgument("isFromHomeScreen") {
-                                    type = NavType.BoolType
-                                    defaultValue = false
-                                },
-                                navArgument("isFromNewBudgetScreen") {
-                                    type = NavType.BoolType
-                                    defaultValue = false
-                                }
-                            )
+                            arguments = listOf(navArgument("isFromHomeScreen") {
+                                type = NavType.BoolType
+                                defaultValue = false
+                            }, navArgument("isFromNewBudgetScreen") {
+                                type = NavType.BoolType
+                                defaultValue = false
+                            })
                         ) { backStackEntry ->
-                            val isFromHomeScreen = backStackEntry.arguments?.getBoolean("isFromHomeScreen") ?: false
-                            val isFromNewBudgetScreen = backStackEntry.arguments?.getBoolean("isFromNewBudgetScreen") ?: false
+                            val isFromHomeScreen =
+                                backStackEntry.arguments?.getBoolean("isFromHomeScreen") ?: false
+                            val isFromNewBudgetScreen =
+                                backStackEntry.arguments?.getBoolean("isFromNewBudgetScreen")
+                                    ?: false
                             InitialRegistrationScreen(
                                 navController = navController,
                                 isFromHomeScreen = isFromHomeScreen,
@@ -50,7 +52,23 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("home") { HomeScreen(navController) }
-                        composable("new_budget") { NewBudgetScreen(navController) }
+                        composable(
+                            "new_budget?customerJson={customerJson}", arguments = listOf(
+                                navArgument("customerJson") {
+                                    type = NavType.StringType
+                                    defaultValue = ""
+                                })
+                        ) { backStackEntry ->
+                            val customerJson = backStackEntry.arguments?.getString("customerJson")
+                            var customer: Customer? = null
+                            if (customerJson != null && customerJson.isNotEmpty()) {
+                                customer = Json.decodeFromString<Customer>(customerJson)
+                            }
+                            NewBudgetScreen(
+                                navController = navController,
+                                customer = customer,
+                            )
+                        }
                         composable("my_budgets") { MyBudgetsScreen(navController) }
                     }
                 }
