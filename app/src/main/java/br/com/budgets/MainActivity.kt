@@ -70,6 +70,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("my_budgets") { MyBudgetsScreen(navController) }
+
+                        // Adicionando o destino para BudgetViewScreen
+                        composable("budget_view") {
+                            BudgetViewScreen(navController = navController)
+                        }
                     }
                 }
             }

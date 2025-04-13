@@ -37,4 +37,12 @@
     <string name="city">Cidade:</string>
     <string name="state">Estado:</string>
     <string name="save">Salvar</string>
+    <string name="view_budget">Visualizar Orçamento</string>
+    <string name="date">Data</string>
+    <string name="client">Cliente</string>
+    <string name="order_details">Aqui está o orçamento conforme solicitado:</string>
+    <string name="description">DESCRIÇÃO</string>
+    <string name="value">VALOR</string>
+    <string name="quantity">QTD</string>
+    <string name="payment_method">Forma de pagamento: A combinar.</string>
 </resources>

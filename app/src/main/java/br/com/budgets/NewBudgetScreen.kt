@@ -181,7 +181,12 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
         Spacer(modifier = Modifier.weight(1f))
 
         OutlinedButton(
-            modifier = Modifier.fillMaxWidth(), onClick = {}) {
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                // Navega para a tela de visualização do orçamento
+                navController.navigate("budget_view")
+            }
+        ) {
             Text(text = stringResource(R.string.generate_budget))
         }
     }
