@@ -6,39 +6,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,17 +29,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.budgets.data.Customer
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewBudgetScreen(navController: NavController, customer: Customer?) {
     var showAddProductOrServiceModal by remember { mutableStateOf(false) }
+    var productsAndServices by remember { mutableStateOf(listOf<Pair<String, String>>()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(vertical = 48.dp, horizontal = 16.dp)
     ) {
         Text(
@@ -77,10 +55,11 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
             CustomerItem(customer)
         } else {
             OutlinedButton(
-                modifier = Modifier.fillMaxWidth(), onClick = {
-                    // Navega para a tela de registro inicial e indica que veio da tela de novo orçamento
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
                     navController.navigate("initial_registration?isFromNewBudgetScreen=true")
-                }) {
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
                     contentDescription = null,
@@ -105,8 +84,21 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        productsAndServices.forEach { (name, value) ->
+            ProductServiceItem(
+                name = name,
+                value = value,
+                onDelete = {
+                    productsAndServices = productsAndServices.filter { it.first != name || it.second != value }
+                }
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+
         OutlinedButton(
-            modifier = Modifier.fillMaxWidth(), onClick = { showAddProductOrServiceModal = true }) {
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { showAddProductOrServiceModal = true }
+        ) {
             Icon(
                 imageVector = Icons.Default.AddCircle,
                 contentDescription = null,
@@ -117,10 +109,13 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
         }
 
         if (showAddProductOrServiceModal) {
-            AddProductOrServiceModal(onConfirm = { name, value ->
-                println("Produto ou Serviço Adicionado: Nome = $name, Valor = $value")
-                showAddProductOrServiceModal = false
-            }, onDismiss = { showAddProductOrServiceModal = false })
+            AddProductOrServiceModal(
+                onConfirm = { name, value ->
+                    productsAndServices = productsAndServices + (name to "R$ $value")
+                    showAddProductOrServiceModal = false
+                },
+                onDismiss = { showAddProductOrServiceModal = false }
+            )
         }
 
         HorizontalDivider(
@@ -141,7 +136,8 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
             modifier = Modifier.fillMaxWidth(),
             value = "",
             onValueChange = {},
-            label = { Text(stringResource(R.string.city_hint)) })
+            label = { Text(stringResource(R.string.city_hint)) }
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -166,7 +162,7 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
         Row {
             Text(text = stringResource(R.string.items_quantity))
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = "0")
+            Text(text = productsAndServices.size.toString())
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -174,20 +170,52 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
         Row {
             Text(text = stringResource(R.string.total))
             Spacer(modifier = Modifier.weight(1f))
-            Text(text = "R$ 0,00")
+            Text(text = "R$ ${calculateTotal(productsAndServices)}")
         }
 
-        // To align the button to the end of the screen
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                // Navega para a tela de visualização do orçamento
                 navController.navigate("budget_view")
             }
         ) {
             Text(text = stringResource(R.string.generate_budget))
+        }
+    }
+}
+
+@Composable
+fun CustomerItem(customer: Customer) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(15.dp))
+                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .clickable {}
+                .padding(vertical = 8.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(text = customer.name, fontWeight = FontWeight.Bold)
+                Text(text = customer.cpfOrCnpj, fontWeight = FontWeight.Bold)
+            }
+
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(20.dp)
+                    .clickable {}
+            )
         }
     }
 }
@@ -215,10 +243,14 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
                         showModal = true
                     }
                 }
-            })
+            }
+    )
 
     if (showModal) {
-        DatePickerModal(onDateSelected = { selectedDate = it }, onDismiss = { showModal = false })
+        DatePickerModal(
+            onDateSelected = { selectedDate = it },
+            onDismiss = { showModal = false }
+        )
     }
 }
 
@@ -233,54 +265,36 @@ fun convertMillisToDate(millis: Long): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerModal(
-    onDateSelected: (Long?) -> Unit, onDismiss: () -> Unit
+    onDateSelected: (Long?) -> Unit,
+    onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
 
-    DatePickerDialog(onDismissRequest = onDismiss, confirmButton = {
-        TextButton(onClick = {
-            onDateSelected(datePickerState.selectedDateMillis)
-            onDismiss()
-        }) {
-            Text(stringResource(R.string.ok))
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onDateSelected(datePickerState.selectedDateMillis)
+                    onDismiss()
+                }
+            ) {
+                Text(stringResource(R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.cancel))
+            }
         }
-    }, dismissButton = {
-        TextButton(onClick = onDismiss) {
-            Text(text = stringResource(R.string.cancel))
-        }
-    }) {
+    ) {
         DatePicker(state = datePickerState)
     }
 }
 
-@Composable
-fun CustomerItem(customer: Customer) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(15.dp))
-                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(15.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .clickable {}
-                .padding(vertical = 8.dp, horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween) {
-            Column {
-                Text(text = customer.name, fontWeight = FontWeight.Bold)
-                Text(text = customer.cpfOrCnpj, fontWeight = FontWeight.Bold)
-            }
-
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(20.dp)
-                    .clickable {})
-        }
-    }
+fun calculateTotal(productsAndServices: List<Pair<String, String>>): String {
+    return productsAndServices
+        .map { it.second.replace("R$ ", "").replace(",", ".").toDoubleOrNull() ?: 0.0 }
+        .sum()
+        .let { String.format("%.2f", it) }
 }
