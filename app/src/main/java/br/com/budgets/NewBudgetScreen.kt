@@ -33,9 +33,10 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewBudgetScreen(navController: NavController, customer: Customer?) {
+fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
     var showAddProductOrServiceModal by remember { mutableStateOf(false) }
     var productsAndServices by remember { mutableStateOf(listOf<Pair<String, String>>()) }
+    var customer by remember { mutableStateOf(initialCustomer) }
 
     Column(
         modifier = Modifier
@@ -52,7 +53,7 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
         Spacer(modifier = Modifier.height(8.dp))
 
         if (customer != null) {
-            CustomerItem(customer)
+            CustomerCard(customer!!, onDelete = { customer = null })
         } else {
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
@@ -187,7 +188,7 @@ fun NewBudgetScreen(navController: NavController, customer: Customer?) {
 }
 
 @Composable
-fun CustomerItem(customer: Customer) {
+fun CustomerCard(customer: Customer, onDelete: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -214,7 +215,9 @@ fun CustomerItem(customer: Customer) {
                 contentDescription = null,
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable {}
+                    .clickable {
+                        onDelete()
+                    }
             )
         }
     }

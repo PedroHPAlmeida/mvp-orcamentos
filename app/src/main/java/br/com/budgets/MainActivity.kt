@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
                             }
                             NewBudgetScreen(
                                 navController = navController,
-                                customer = customer,
+                                initialCustomer = customer,
                             )
                         }
                         composable("my_budgets") { MyBudgetsScreen(navController) }
