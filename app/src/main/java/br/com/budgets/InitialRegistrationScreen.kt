@@ -42,10 +42,11 @@ import kotlinx.serialization.json.Json
 fun InitialRegistrationScreen(
     navController: NavController,
     isFromHomeScreen: Boolean = false,
-    isFromNewBudgetScreen: Boolean = false // Nova variável para identificar a origem
+    isFromNewBudgetScreen: Boolean = false, // Nova variável para identificar a origem
+    customer: Customer? = null
 ) {
-    var name by remember { mutableStateOf("") }
-    var cpfCnpj by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(customer?.name ?: "")}
+    var cpfCnpj by remember { mutableStateOf(customer?.cpfOrCnpj ?: "") }
     var phone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var cep by remember { mutableStateOf("") }

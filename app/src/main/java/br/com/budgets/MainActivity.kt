@@ -31,24 +31,32 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         composable(
-                            "initial_registration?isFromHomeScreen={isFromHomeScreen}&isFromNewBudgetScreen={isFromNewBudgetScreen}",
+                            "initial_registration?isFromHomeScreen={isFromHomeScreen}&isFromNewBudgetScreen={isFromNewBudgetScreen}&customerJson={customerJson}",
                             arguments = listOf(navArgument("isFromHomeScreen") {
                                 type = NavType.BoolType
                                 defaultValue = false
                             }, navArgument("isFromNewBudgetScreen") {
                                 type = NavType.BoolType
                                 defaultValue = false
+                            }, navArgument("customerJson") {
+                                type = NavType.StringType
+                                defaultValue = ""
                             })
                         ) { backStackEntry ->
                             val isFromHomeScreen =
-                                backStackEntry.arguments?.getBoolean("isFromHomeScreen") ?: false
+                                backStackEntry.arguments?.getBoolean("isFromHomeScreen") == true
                             val isFromNewBudgetScreen =
-                                backStackEntry.arguments?.getBoolean("isFromNewBudgetScreen")
-                                    ?: false
+                                backStackEntry.arguments?.getBoolean("isFromNewBudgetScreen") == true
+                            val customerJson = backStackEntry.arguments?.getString("customerJson")
+                            var customer: Customer? = null
+                            if (customerJson != null && customerJson.isNotEmpty()) {
+                                customer = Json.decodeFromString<Customer>(customerJson)
+                            }
                             InitialRegistrationScreen(
                                 navController = navController,
                                 isFromHomeScreen = isFromHomeScreen,
-                                isFromNewBudgetScreen = isFromNewBudgetScreen
+                                isFromNewBudgetScreen = isFromNewBudgetScreen,
+                                customer = customer
                             )
                         }
                         composable("home") { HomeScreen(navController) }
