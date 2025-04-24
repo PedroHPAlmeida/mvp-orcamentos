@@ -1,12 +1,10 @@
 package br.com.budgets
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,33 +34,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import br.com.budgets.data.Customer
+import br.com.budgets.data.CustomerAddress
+import br.com.budgets.utils.convertMillisToDate
 
 @Composable
-fun BudgetViewScreen(navController: NavController) {
-    // Mock de dados dinâmicos
+fun BudgetViewScreen(
+    navController: NavController,
+    customer: Customer?,
+    services: List<Pair<String, String>>
+) {
+    // Mock de dados do dono do app
     val companyName = "Serviços LTDA"
     val companyContact = "15981229330 - servicos@email.com"
     val companyAddress = "Rua Agora Vai, 1000"
-    val date = "27 de março de 2025"
-    val clientName = "Thyago Lobato"
-    val clientCpfCnpj = "12611121724"
-    val clientAddress = "Rua Agora Foi, 10"
 
-    // Mock dos serviços como uma lista de mapas
-    val services = listOf(
+    val date = convertMillisToDate(System.currentTimeMillis()) // Data atual
+    val clientName = customer?.name ?: "Cliente não definido"
+    val clientCpfCnpj = customer?.cpfOrCnpj ?: "CPF/CNPJ não definido"
+    val clientAddress = customer?.address?.getFormattedAddress() ?: "Endereço não definido"
+
+    // Transformar lista de serviços para o formato usado na tabela
+    val formattedServices = services.map { (name, value) ->
         mapOf(
-            "description" to "Marcenaria",
-            "value" to "R$ 100,00",
-            "quantity" to "1",
-            "total" to "R$ 100,00"
-        ),
-        mapOf(
-            "description" to "Pintura",
-            "value" to "R$ 200,00",
-            "quantity" to "2",
-            "total" to "R$ 400,00"
+            "description" to name,
+            "value" to value,
+            "quantity" to "1", // Por enquanto, estático
+            "total" to value
         )
-    )
+    }
+
+    // Calcular o total dos serviços
+    val totalValue = services.sumOf {
+        it.second.replace("R$ ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
+    }
 
     Column(
         modifier = Modifier
@@ -88,7 +93,8 @@ fun BudgetViewScreen(navController: NavController) {
             clientName = clientName,
             clientCpfCnpj = clientCpfCnpj,
             clientAddress = clientAddress,
-            services = services
+            services = formattedServices,
+            totalValue = totalValue
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -129,7 +135,8 @@ fun BudgetDetails(
     clientName: String,
     clientCpfCnpj: String,
     clientAddress: String,
-    services: List<Map<String, String>>
+    services: List<Map<String, String>>,
+    totalValue: Double
 ) {
     Column(
         modifier = Modifier
@@ -202,6 +209,10 @@ fun BudgetDetails(
                 items(services.size) { index ->
                     TableRow(service = services[index])
                 }
+                // Adicionar a linha do total
+                item {
+                    TotalRow(totalValue = totalValue)
+                }
             }
         }
 
@@ -228,7 +239,7 @@ fun TableHeader() {
             fontSize = 14.sp,
             modifier = Modifier
                 .weight(2f)
-                .border(0.5.dp, Color.Black), // Borda entre colunas
+                .border(0.5.dp, Color.Black),
             textAlign = TextAlign.Center
         )
         Text(
@@ -237,7 +248,7 @@ fun TableHeader() {
             fontSize = 14.sp,
             modifier = Modifier
                 .weight(2f)
-                .border(0.5.dp, Color.Black), // Borda entre colunas
+                .border(0.5.dp, Color.Black),
             textAlign = TextAlign.Center
         )
         Text(
@@ -246,7 +257,7 @@ fun TableHeader() {
             fontSize = 14.sp,
             modifier = Modifier
                 .weight(1f)
-                .border(0.5.dp, Color.Black), // Borda entre colunas
+                .border(0.5.dp, Color.Black),
             textAlign = TextAlign.Center
         )
         Text(
@@ -255,7 +266,7 @@ fun TableHeader() {
             fontSize = 14.sp,
             modifier = Modifier
                 .weight(1.5f)
-                .border(0.5.dp, Color.Black), // Borda entre colunas
+                .border(0.5.dp, Color.Black),
             textAlign = TextAlign.Center
         )
     }
@@ -268,69 +279,70 @@ fun TableRow(service: Map<String, String>) {
             .fillMaxWidth()
             .border(1.dp, Color.Black)
     ) {
-        // Coluna "Descrição"
-        Column(
+        Text(
+            text = service["description"] ?: "",
             modifier = Modifier
                 .weight(2f)
                 .border(0.5.dp, Color.Black)
-                .padding(4.dp)
-        ) {
-            Text(
-                text = service["description"] ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        // Coluna "Valor"
-        Column(
+                .padding(4.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp
+        )
+        Text(
+            text = service["value"] ?: "",
             modifier = Modifier
                 .weight(2f)
                 .border(0.5.dp, Color.Black)
-                .padding(4.dp)
-        ) {
-            Text(
-                text = service["value"] ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        // Coluna "QTD"
-        Column(
+                .padding(4.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp
+        )
+        Text(
+            text = service["quantity"] ?: "",
             modifier = Modifier
                 .weight(1f)
                 .border(0.5.dp, Color.Black)
-                .padding(4.dp)
-        ) {
-            Text(
-                text = service["quantity"] ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        // Coluna "Total"
-        Column(
+                .padding(4.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp
+        )
+        Text(
+            text = service["total"] ?: "",
             modifier = Modifier
                 .weight(1.5f)
                 .border(0.5.dp, Color.Black)
-                .padding(4.dp)
-        ) {
-            Text(
-                text = service["total"] ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.weight(1f))
-        }
+                .padding(4.dp),
+            textAlign = TextAlign.Center,
+            fontSize = 12.sp
+        )
+    }
+}
+
+@Composable
+fun TotalRow(totalValue: Double) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.Black)
+    ) {
+        Text(
+            text = "Total:",
+            modifier = Modifier
+                .weight(5f)
+                .padding(4.dp),
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Start,
+            fontSize = 12.sp
+        )
+        Text(
+            text = "R$ %.2f".format(totalValue),
+            modifier = Modifier
+                .weight(1.5f)
+                .padding(4.dp),
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Start,
+            fontSize = 12.sp
+        )
     }
 }
 
@@ -356,5 +368,26 @@ fun ActionButtons() {
 @Preview(showBackground = true)
 @Composable
 fun BudgetViewScreenPreview() {
-    BudgetViewScreen(navController = rememberNavController())
+    val customer = Customer(
+        name = "Thyago Lobato",
+        cpfOrCnpj = "12611121724",
+        address = CustomerAddress(
+            postalCode = "12345-678",
+            street = "Rua das Flores",
+            number = "100",
+            complement = "Casa",
+            neighborhood = "Centro",
+            city = "São Paulo",
+            state = "SP"
+        )
+    )
+    val services = listOf(
+        "Marcenaria" to "R$ 100,00",
+        "Pintura" to "R$ 200,00"
+    )
+    BudgetViewScreen(
+        navController = rememberNavController(),
+        customer = customer,
+        services = services
+    )
 }

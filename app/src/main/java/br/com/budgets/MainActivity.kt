@@ -80,8 +80,35 @@ class MainActivity : ComponentActivity() {
                         composable("my_budgets") { MyBudgetsScreen(navController) }
 
                         // Adicionando o destino para BudgetViewScreen
-                        composable("budget_view") {
-                            BudgetViewScreen(navController = navController)
+                        composable(
+                            "budget_view?customer={customer}&services={services}",
+                            arguments = listOf(
+                                navArgument("customer") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                },
+                                navArgument("services") {
+                                    type = NavType.StringType
+                                    nullable = true
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val customerJson = backStackEntry.arguments?.getString("customer")
+                            val servicesJson = backStackEntry.arguments?.getString("services")
+
+                            val customer = customerJson?.let {
+                                Json.decodeFromString<Customer>(it)
+                            }
+
+                            val services = servicesJson?.let {
+                                Json.decodeFromString<List<Pair<String, String>>>(it)
+                            } ?: emptyList()
+
+                            BudgetViewScreen(
+                                navController = navController,
+                                customer = customer,
+                                services = services
+                            )
                         }
                     }
                 }

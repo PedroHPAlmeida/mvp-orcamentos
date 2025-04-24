@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.budgets.data.Customer
+import br.com.budgets.data.CustomerAddress
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -45,15 +46,17 @@ fun InitialRegistrationScreen(
     isFromNewBudgetScreen: Boolean = false, // Nova variável para identificar a origem
     customer: Customer? = null
 ) {
-    var name by remember { mutableStateOf(customer?.name ?: "")}
+    var name by remember { mutableStateOf(customer?.name ?: "") }
     var cpfCnpj by remember { mutableStateOf(customer?.cpfOrCnpj ?: "") }
     var phone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var cep by remember { mutableStateOf("") }
-    var addressDetail by remember { mutableStateOf("") }
-    var neighborhood by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var state by remember { mutableStateOf("") }
+    var cep by remember { mutableStateOf(customer?.address?.postalCode ?: "") }
+    var addressDetail by remember { mutableStateOf(customer?.address?.street ?: "") }
+    var number by remember { mutableStateOf(customer?.address?.number ?: "") } // Novo campo para "Número"
+    var complement by remember { mutableStateOf("") } // Novo campo para "Complemento"
+    var neighborhood by remember { mutableStateOf(customer?.address?.neighborhood ?: "") }
+    var city by remember { mutableStateOf(customer?.address?.city ?: "") }
+    var state by remember { mutableStateOf(customer?.address?.state ?: "") }
 
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
@@ -129,6 +132,24 @@ fun InitialRegistrationScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Campo para "Número"
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = number,
+                onValueChange = { number = it },
+                label = { Text(stringResource(R.string.house_number)) })
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Campo para "Complemento"
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = complement,
+                onValueChange = { complement = it },
+                label = { Text(stringResource(R.string.complement)) }) // Exemplo: Apartamento, Bloco, Casa 2
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = neighborhood,
@@ -169,7 +190,17 @@ fun InitialRegistrationScreen(
                                 navController.navigate("home")
                             }
                             if (isFromNewBudgetScreen) {
-                                val customer = Json.encodeToString(Customer(name, cpfCnpj))
+                                // Criando o objeto CustomerAddress
+                                val address = CustomerAddress(
+                                    postalCode = cep,
+                                    street = addressDetail,
+                                    number = number,
+                                    complement = complement,
+                                    neighborhood = neighborhood,
+                                    city = city,
+                                    state = state
+                                )
+                                val customer = Json.encodeToString(Customer(name, cpfCnpj, address))
                                 navController.navigate(
                                     "new_budget?customerJson=${
                                         Uri.encode(

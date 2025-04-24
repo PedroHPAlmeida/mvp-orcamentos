@@ -54,13 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import br.com.budgets.data.Customer
+import br.com.budgets.utils.convertMillisToDate
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
     var showAddProductOrServiceModal by remember { mutableStateOf(false) }
@@ -206,7 +203,11 @@ fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
 
         OutlinedButton(
             modifier = Modifier.fillMaxWidth(), onClick = {
-                navController.navigate("budget_view")
+                val customerJson = customer?.let { Json.encodeToString(it) } ?: ""
+                val servicesJson = Json.encodeToString(productsAndServices)
+                navController.navigate(
+                    "budget_view?customer=$customerJson&services=$servicesJson"
+                )
             }) {
             Text(text = stringResource(R.string.generate_budget))
         }
@@ -273,14 +274,6 @@ fun DatePickerFieldToModal(modifier: Modifier = Modifier) {
     if (showModal) {
         DatePickerModal(onDateSelected = { selectedDate = it }, onDismiss = { showModal = false })
     }
-}
-
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    val calendar = Calendar.getInstance()
-    calendar.timeInMillis = millis
-    calendar.add(Calendar.DAY_OF_MONTH, 1)
-    return formatter.format(calendar.time)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

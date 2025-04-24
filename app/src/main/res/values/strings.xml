@@ -45,4 +45,6 @@
     <string name="value">VALOR</string>
     <string name="quantity">QTD</string>
     <string name="payment_method">Forma de pagamento: A combinar.</string>
+    <string name="house_number">Número:</string>
+    <string name="complement">Complemento:</string>
 </resources>
