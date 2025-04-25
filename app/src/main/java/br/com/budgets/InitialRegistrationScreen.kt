@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.budgets.data.Customer
@@ -22,6 +23,7 @@ import br.com.budgets.data.CustomerAddress
 import br.com.budgets.data.Owner
 import br.com.budgets.data.OwnerAddress
 import br.com.budgets.data.OwnerDataStore
+import br.com.budgets.viewmodel.AddressViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -54,6 +56,11 @@ fun InitialRegistrationScreen(
     val density = LocalDensity.current
     val context = LocalContext.current
 
+    // ViewModel para buscar o endereço
+    val viewModel = AddressViewModel()
+    val address by viewModel.address.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+
     // Carregar os dados do dono do DataStore, se necessário
     LaunchedEffect(isFromHomeScreen) {
         if (isFromHomeScreen) {
@@ -82,6 +89,16 @@ fun InitialRegistrationScreen(
             neighborhood = customer.address?.neighborhood ?: ""
             city = customer.address?.city ?: ""
             state = customer.address?.state ?: ""
+        }
+    }
+
+    // Atualizar os campos com os dados retornados pela API
+    LaunchedEffect(address) {
+        address?.let {
+            addressDetail = it.logradouro ?: ""
+            neighborhood = it.bairro ?: ""
+            city = it.localidade ?: ""
+            state = it.uf ?: ""
         }
     }
 
@@ -140,11 +157,35 @@ fun InitialRegistrationScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = cep,
-                onValueChange = { cep = it },
-                label = { Text(stringResource(R.string.zip_code)) })
+            // Campo de CEP com o botão ao lado
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    modifier = Modifier.weight(3f),
+                    value = cep,
+                    onValueChange = { cep = it },
+                    label = { Text(stringResource(R.string.zip_code)) }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        if (cep.isNotEmpty()) {
+                            viewModel.fetchAddress(cep) // Buscar o endereço com base no CEP
+                        }
+                    }
+                ) {
+                    Text(text = stringResource(R.string.search))
+                }
+            }
+
+            // Mensagem de erro, se existir
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -196,6 +237,7 @@ fun InitialRegistrationScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Lógica dos botões de salvar/cancelar permanece como está
             if (isFromHomeScreen || isFromNewBudgetScreen) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -241,7 +283,6 @@ fun InitialRegistrationScreen(
                                 }
                             }
                             if (isFromNewBudgetScreen) {
-                                // Criando o objeto CustomerAddress
                                 val address = CustomerAddress(
                                     postalCode = cep,
                                     street = addressDetail,
@@ -261,11 +302,9 @@ fun InitialRegistrationScreen(
                     }
                 }
             } else {
-                // Garantir que o botão salvar apareça na abertura inicial (sem origem específica)
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
-                        // Salvar os dados do dono no DataStore
                         val owner = Owner(
                             name = name,
                             cpfOrCnpj = cpfCnpj,
