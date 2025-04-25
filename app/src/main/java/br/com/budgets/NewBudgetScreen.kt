@@ -7,17 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,23 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -202,13 +177,16 @@ fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
         Spacer(modifier = Modifier.height(32.dp))
 
         OutlinedButton(
-            modifier = Modifier.fillMaxWidth(), onClick = {
+            modifier = Modifier.fillMaxWidth(),
+            onClick = {
+                // Serializar os dados do cliente e serviços para enviar à BudgetViewScreen
                 val customerJson = customer?.let { Json.encodeToString(it) } ?: ""
                 val servicesJson = Json.encodeToString(productsAndServices)
                 navController.navigate(
                     "budget_view?customer=$customerJson&services=$servicesJson"
                 )
-            }) {
+            }
+        ) {
             Text(text = stringResource(R.string.generate_budget))
         }
     }
@@ -230,7 +208,8 @@ fun CustomerCard(customer: Customer, onClick: () -> Unit, onDelete: () -> Unit) 
                 .clickable { onClick() }
                 .padding(vertical = 8.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween) {
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
             Column {
                 Text(text = customer.name, fontWeight = FontWeight.Bold)
                 Text(text = customer.cpfOrCnpj, fontWeight = FontWeight.Bold)

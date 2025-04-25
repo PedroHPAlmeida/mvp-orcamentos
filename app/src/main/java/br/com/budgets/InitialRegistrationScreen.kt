@@ -1,31 +1,14 @@
 package br.com.budgets
 
 import android.net.Uri
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +19,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.budgets.data.Customer
 import br.com.budgets.data.CustomerAddress
+import br.com.budgets.data.Owner
+import br.com.budgets.data.OwnerAddress
+import br.com.budgets.data.OwnerDataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -52,14 +42,15 @@ fun InitialRegistrationScreen(
     var email by remember { mutableStateOf("") }
     var cep by remember { mutableStateOf(customer?.address?.postalCode ?: "") }
     var addressDetail by remember { mutableStateOf(customer?.address?.street ?: "") }
-    var number by remember { mutableStateOf(customer?.address?.number ?: "") } // Novo campo para "Número"
-    var complement by remember { mutableStateOf("") } // Novo campo para "Complemento"
+    var number by remember { mutableStateOf(customer?.address?.number ?: "") }
+    var complement by remember { mutableStateOf("") }
     var neighborhood by remember { mutableStateOf(customer?.address?.neighborhood ?: "") }
     var city by remember { mutableStateOf(customer?.address?.city ?: "") }
     var state by remember { mutableStateOf(customer?.address?.state ?: "") }
 
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
+    val context = LocalContext.current // Obter o contexto para usar o DataStore
 
     Box(
         modifier = Modifier
@@ -132,7 +123,6 @@ fun InitialRegistrationScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo para "Número"
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = number,
@@ -141,12 +131,11 @@ fun InitialRegistrationScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo para "Complemento"
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = complement,
                 onValueChange = { complement = it },
-                label = { Text(stringResource(R.string.complement)) }) // Exemplo: Apartamento, Bloco, Casa 2
+                label = { Text(stringResource(R.string.complement)) })
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -174,7 +163,7 @@ fun InitialRegistrationScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isFromHomeScreen || isFromNewBudgetScreen) { // Condição ajustada
+            if (isFromHomeScreen || isFromNewBudgetScreen) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -187,7 +176,33 @@ fun InitialRegistrationScreen(
                     OutlinedButton(
                         modifier = Modifier.weight(1f), onClick = {
                             if (isFromHomeScreen) {
-                                navController.navigate("home")
+                                // Salvar os dados do dono no DataStore
+                                val owner = Owner(
+                                    name = name,
+                                    cpfOrCnpj = cpfCnpj,
+                                    address = OwnerAddress(
+                                        street = addressDetail,
+                                        number = number,
+                                        complement = complement,
+                                        neighborhood = neighborhood,
+                                        city = city,
+                                        state = state,
+                                        postalCode = cep
+                                    )
+                                )
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    try {
+                                        OwnerDataStore.saveOwnerData(context, owner)
+                                        println("Dados do dono salvos com sucesso: $owner")
+                                        // Navegar para HomeScreen na main thread
+                                        withContext(Dispatchers.Main) {
+                                            navController.navigate("home")
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                        println("Erro ao salvar os dados do dono: ${e.message}")
+                                    }
+                                }
                             }
                             if (isFromNewBudgetScreen) {
                                 // Criando o objeto CustomerAddress
@@ -202,11 +217,7 @@ fun InitialRegistrationScreen(
                                 )
                                 val customer = Json.encodeToString(Customer(name, cpfCnpj, address))
                                 navController.navigate(
-                                    "new_budget?customerJson=${
-                                        Uri.encode(
-                                            customer
-                                        )
-                                    }"
+                                    "new_budget?customerJson=${Uri.encode(customer)}"
                                 )
                             }
                         }) {
@@ -216,7 +227,35 @@ fun InitialRegistrationScreen(
             } else {
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { navController.navigate("home") }) {
+                    onClick = {
+                        // Salvar os dados do dono no DataStore
+                        val owner = Owner(
+                            name = name,
+                            cpfOrCnpj = cpfCnpj,
+                            address = OwnerAddress(
+                                street = addressDetail,
+                                number = number,
+                                complement = complement,
+                                neighborhood = neighborhood,
+                                city = city,
+                                state = state,
+                                postalCode = cep
+                            )
+                        )
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                OwnerDataStore.saveOwnerData(context, owner)
+                                println("Dados do dono salvos com sucesso: $owner")
+                                // Navegar para HomeScreen na main thread
+                                withContext(Dispatchers.Main) {
+                                    navController.navigate("home")
+                                }
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                println("Erro ao salvar os dados do dono: ${e.message}")
+                            }
+                        }
+                    }) {
                     Text(text = stringResource(R.string.save))
                 }
             }

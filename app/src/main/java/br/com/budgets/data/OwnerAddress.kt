@@ -1,0 +1,24 @@
+package br.com.budgets.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class OwnerAddress(
+    val postalCode: String,
+    val street: String,
+    val number: String,
+    val complement: String?,
+    val neighborhood: String,
+    val city: String,
+    val state: String
+) {
+
+    fun getFormattedAddress(): String {
+        val baseAddress = "$street, $number - $city/$state"
+        return if (!complement.isNullOrBlank()) {
+            "$baseAddress ($complement)"
+        } else {
+            baseAddress
+        }
+    }
+}

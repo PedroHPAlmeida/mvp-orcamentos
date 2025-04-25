@@ -23,9 +23,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +39,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.budgets.data.Customer
 import br.com.budgets.data.CustomerAddress
+import br.com.budgets.data.Owner
+import br.com.budgets.data.OwnerDataStore
 import br.com.budgets.utils.convertMillisToDate
 
 @Composable
@@ -44,10 +49,12 @@ fun BudgetViewScreen(
     customer: Customer?,
     services: List<Pair<String, String>>
 ) {
-    // Mock de dados do dono do app
-    val companyName = "Serviços LTDA"
-    val companyContact = "15981229330 - servicos@email.com"
-    val companyAddress = "Rua Agora Vai, 1000"
+    // Recuperar o contexto para usar o DataStore
+    val context = LocalContext.current
+
+    // Observar os dados do dono do DataStore
+    val ownerFlow = OwnerDataStore.getOwnerData(context)
+    val owner by ownerFlow.collectAsState(initial = null)
 
     val date = convertMillisToDate(System.currentTimeMillis()) // Data atual
     val clientName = customer?.name ?: "Cliente não definido"
@@ -86,9 +93,7 @@ fun BudgetViewScreen(
 
         // Corpo principal com informações do orçamento
         BudgetDetails(
-            companyName = companyName,
-            companyContact = companyContact,
-            companyAddress = companyAddress,
+            owner = owner, // Passar os dados do dono (carregados do DataStore)
             date = date,
             clientName = clientName,
             clientCpfCnpj = clientCpfCnpj,
@@ -128,9 +133,7 @@ fun Header(title: String, onBackClick: () -> Unit) {
 
 @Composable
 fun BudgetDetails(
-    companyName: String,
-    companyContact: String,
-    companyAddress: String,
+    owner: Owner?, // Adicionado o dono como parâmetro
     date: String,
     clientName: String,
     clientCpfCnpj: String,
@@ -145,9 +148,17 @@ fun BudgetDetails(
             .padding(16.dp)
     ) {
         // Dados do dono do app
-        Text(text = companyName, fontWeight = FontWeight.Bold)
-        Text(text = companyContact)
-        Text(text = companyAddress)
+        if (owner != null) {
+            Text(text = owner.name, fontWeight = FontWeight.Bold)
+            Text(text = owner.cpfOrCnpj)
+            Text(
+                text = owner.address?.let {
+                    "${it.street}, ${it.number} - ${it.neighborhood}, ${it.city} - ${it.state}"
+                } ?: "Endereço não definido"
+            )
+        } else {
+            Text(text = "Dados do dono não disponíveis", fontWeight = FontWeight.Bold)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
