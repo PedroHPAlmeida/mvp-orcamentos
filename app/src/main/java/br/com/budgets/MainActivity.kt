@@ -13,7 +13,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import br.com.budgets.data.Customer
+import br.com.budgets.data.OwnerDataStore
 import br.com.budgets.ui.theme.BudgetsTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
@@ -21,13 +25,20 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Verificar se há dados do dono salvos no DataStore
+        val hasOwnerData = runBlocking(Dispatchers.IO) {
+            val owner = OwnerDataStore.getOwnerData(this@MainActivity).first()
+            owner != null // Retorna true se os dados do dono existirem
+        }
+
         setContent {
             BudgetsTheme {
                 val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) {
                     NavHost(
                         navController = navController,
-                        startDestination = "initial_registration",
+                        startDestination = if (hasOwnerData) "home" else "initial_registration",
                         modifier = Modifier.fillMaxSize()
                     ) {
                         composable(
