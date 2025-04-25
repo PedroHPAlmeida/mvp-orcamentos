@@ -166,15 +166,18 @@ fun InitialRegistrationScreen(
                     label = { Text(stringResource(R.string.zip_code)) }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    modifier = Modifier.weight(1f),
+                OutlinedButton(
+                    modifier = Modifier.weight(1f), // Ajustar o tamanho proporcional ao campo de CEP
                     onClick = {
                         if (cep.isNotEmpty()) {
                             viewModel.fetchAddress(cep) // Buscar o endereço com base no CEP
                         }
                     }
                 ) {
-                    Text(text = stringResource(R.string.search))
+                    Text(
+                        text = stringResource(R.string.search),
+                        fontSize = 12.sp
+                    )
                 }
             }
 
