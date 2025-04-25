@@ -3,7 +3,6 @@ package br.com.budgets
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -59,6 +58,8 @@ fun BudgetViewScreen(
     val date = convertMillisToDate(System.currentTimeMillis()) // Data atual
     val clientName = customer?.name ?: "Cliente não definido"
     val clientCpfCnpj = customer?.cpfOrCnpj ?: "CPF/CNPJ não definido"
+    val phone = customer?.phone ?: "phone não definido"
+    val email = customer?.email ?: "email não definido"
     val clientAddress = customer?.address?.getFormattedAddress() ?: "Endereço não definido"
 
     // Transformar lista de serviços para o formato usado na tabela
@@ -382,6 +383,8 @@ fun BudgetViewScreenPreview() {
     val customer = Customer(
         name = "Thyago Lobato",
         cpfOrCnpj = "12611121724",
+        phone = "15981229370",
+        email = "thyagollobato@gmail.com",
         address = CustomerAddress(
             postalCode = "12345-678",
             street = "Rua das Flores",

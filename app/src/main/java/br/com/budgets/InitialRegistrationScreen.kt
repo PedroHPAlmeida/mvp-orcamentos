@@ -24,6 +24,7 @@ import br.com.budgets.data.OwnerAddress
 import br.com.budgets.data.OwnerDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -33,24 +34,56 @@ import kotlinx.serialization.json.Json
 fun InitialRegistrationScreen(
     navController: NavController,
     isFromHomeScreen: Boolean = false,
-    isFromNewBudgetScreen: Boolean = false, // Nova variável para identificar a origem
+    isFromNewBudgetScreen: Boolean = false,
     customer: Customer? = null
 ) {
-    var name by remember { mutableStateOf(customer?.name ?: "") }
-    var cpfCnpj by remember { mutableStateOf(customer?.cpfOrCnpj ?: "") }
+    // Estado para os campos do formulário
+    var name by remember { mutableStateOf("") }
+    var cpfCnpj by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var cep by remember { mutableStateOf(customer?.address?.postalCode ?: "") }
-    var addressDetail by remember { mutableStateOf(customer?.address?.street ?: "") }
-    var number by remember { mutableStateOf(customer?.address?.number ?: "") }
+    var cep by remember { mutableStateOf("") }
+    var addressDetail by remember { mutableStateOf("") }
+    var number by remember { mutableStateOf("") }
     var complement by remember { mutableStateOf("") }
-    var neighborhood by remember { mutableStateOf(customer?.address?.neighborhood ?: "") }
-    var city by remember { mutableStateOf(customer?.address?.city ?: "") }
-    var state by remember { mutableStateOf(customer?.address?.state ?: "") }
+    var neighborhood by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var state by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
     val density = LocalDensity.current
-    val context = LocalContext.current // Obter o contexto para usar o DataStore
+    val context = LocalContext.current
+
+    // Carregar os dados do dono do DataStore, se necessário
+    LaunchedEffect(isFromHomeScreen) {
+        if (isFromHomeScreen) {
+            val owner = OwnerDataStore.getOwnerData(context).first()
+            owner?.let {
+                name = it.name
+                cpfCnpj = it.cpfOrCnpj
+                phone = it.phone ?: ""
+                email = it.email ?: ""
+                cep = it.address?.postalCode ?: ""
+                addressDetail = it.address?.street ?: ""
+                number = it.address?.number ?: ""
+                complement = it.address?.complement ?: ""
+                neighborhood = it.address?.neighborhood ?: ""
+                city = it.address?.city ?: ""
+                state = it.address?.state ?: ""
+            }
+        } else if (isFromNewBudgetScreen && customer != null) {
+            // Preencher os campos com os dados do cliente
+            name = customer.name
+            cpfCnpj = customer.cpfOrCnpj
+            cep = customer.address?.postalCode ?: ""
+            addressDetail = customer.address?.street ?: ""
+            number = customer.address?.number ?: ""
+            complement = customer.address?.complement ?: ""
+            neighborhood = customer.address?.neighborhood ?: ""
+            city = customer.address?.city ?: ""
+            state = customer.address?.state ?: ""
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -169,17 +202,21 @@ fun InitialRegistrationScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     OutlinedButton(
-                        modifier = Modifier.weight(1f), onClick = { navController.navigateUp() }) {
+                        modifier = Modifier.weight(1f),
+                        onClick = { navController.navigateUp() }) {
                         Text(text = stringResource(R.string.cancel))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
-                        modifier = Modifier.weight(1f), onClick = {
+                        modifier = Modifier.weight(1f),
+                        onClick = {
                             if (isFromHomeScreen) {
                                 // Salvar os dados do dono no DataStore
                                 val owner = Owner(
                                     name = name,
                                     cpfOrCnpj = cpfCnpj,
+                                    phone = phone,
+                                    email = email,
                                     address = OwnerAddress(
                                         street = addressDetail,
                                         number = number,
@@ -194,7 +231,6 @@ fun InitialRegistrationScreen(
                                     try {
                                         OwnerDataStore.saveOwnerData(context, owner)
                                         println("Dados do dono salvos com sucesso: $owner")
-                                        // Navegar para HomeScreen na main thread
                                         withContext(Dispatchers.Main) {
                                             navController.navigate("home")
                                         }
@@ -215,7 +251,7 @@ fun InitialRegistrationScreen(
                                     city = city,
                                     state = state
                                 )
-                                val customer = Json.encodeToString(Customer(name, cpfCnpj, address))
+                                val customer = Json.encodeToString(Customer(name, cpfCnpj, phone, email, address))
                                 navController.navigate(
                                     "new_budget?customerJson=${Uri.encode(customer)}"
                                 )
@@ -225,6 +261,7 @@ fun InitialRegistrationScreen(
                     }
                 }
             } else {
+                // Garantir que o botão salvar apareça na abertura inicial (sem origem específica)
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
@@ -232,6 +269,8 @@ fun InitialRegistrationScreen(
                         val owner = Owner(
                             name = name,
                             cpfOrCnpj = cpfCnpj,
+                            phone = phone,
+                            email = email,
                             address = OwnerAddress(
                                 street = addressDetail,
                                 number = number,
@@ -246,7 +285,6 @@ fun InitialRegistrationScreen(
                             try {
                                 OwnerDataStore.saveOwnerData(context, owner)
                                 println("Dados do dono salvos com sucesso: $owner")
-                                // Navegar para HomeScreen na main thread
                                 withContext(Dispatchers.Main) {
                                     navController.navigate("home")
                                 }
