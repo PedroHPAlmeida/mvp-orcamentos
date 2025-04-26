@@ -1,4 +1,4 @@
-package br.com.budgets
+package br.com.budgets.ui.screen
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +24,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import br.com.budgets.R
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -86,7 +89,7 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun HomeButton(
     modifier: Modifier = Modifier,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     text: String,
     onClick: () -> Unit
 ) {
@@ -115,7 +118,7 @@ fun HomeButton(
                 text = text,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         }

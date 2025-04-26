@@ -1,4 +1,4 @@
-package br.com.budgets
+package br.com.budgets.ui.screen
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,10 +36,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import br.com.budgets.data.Customer
-import br.com.budgets.data.CustomerAddress
-import br.com.budgets.data.Owner
-import br.com.budgets.data.OwnerDataStore
+import br.com.budgets.R
+import br.com.budgets.domain.model.Customer
+import br.com.budgets.domain.model.CustomerAddress
+import br.com.budgets.domain.model.Owner
+import br.com.budgets.data.local.preferences.OwnerDataStore
 import br.com.budgets.utils.convertMillisToDate
 
 @Composable

@@ -1,4 +1,4 @@
-package br.com.budgets.data
+package br.com.budgets.domain.model
 
 import kotlinx.serialization.Serializable
 

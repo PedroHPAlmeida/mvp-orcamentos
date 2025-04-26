@@ -1,9 +1,9 @@
-package br.com.budgets.data
+package br.com.budgets.domain.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class OwnerAddress(
+data class CustomerAddress(
     val postalCode: String,
     val street: String,
     val number: String,

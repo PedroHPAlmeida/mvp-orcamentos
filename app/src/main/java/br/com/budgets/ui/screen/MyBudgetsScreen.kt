@@ -1,4 +1,4 @@
-package br.com.budgets
+package br.com.budgets.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,7 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import br.com.budgets.data.Budget
+import br.com.budgets.R
+import br.com.budgets.domain.model.Budget
 
 val budgets = listOf(
     Budget(1, "João", 2, 100.0),

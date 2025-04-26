@@ -1,4 +1,4 @@
-package br.com.budgets
+package br.com.budgets.ui.screen
 
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -28,7 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import br.com.budgets.data.Customer
+import br.com.budgets.R
+import br.com.budgets.domain.model.Customer
 import br.com.budgets.utils.convertMillisToDate
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

@@ -1,9 +1,10 @@
-package br.com.budgets.data
+package br.com.budgets.data.local.preferences
 
 import android.content.Context
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import br.com.budgets.domain.model.Owner
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
@@ -20,7 +21,7 @@ object OwnerDataStore {
     // Função para salvar os dados do dono como JSON
     suspend fun saveOwnerData(context: Context, owner: Owner) {
         try {
-            val ownerJson = Json.encodeToString(owner) // Serializa o objeto para JSON
+            val ownerJson = Json.Default.encodeToString(owner) // Serializa o objeto para JSON
             context.dataStore.edit { preferences ->
                 preferences[OWNER_JSON_KEY] = ownerJson
             }
@@ -36,7 +37,7 @@ object OwnerDataStore {
         return context.dataStore.data.map { preferences ->
             val ownerJson = preferences[OWNER_JSON_KEY]
             try {
-                ownerJson?.let { Json.decodeFromString<Owner>(it) } // Desserializa o JSON para objeto
+                ownerJson?.let { Json.Default.decodeFromString<Owner>(it) } // Desserializa o JSON para objeto
             } catch (e: Exception) {
                 e.printStackTrace() // Logar exceções no Logcat
                 println("Erro ao recuperar os dados do dono: ${e.message}")

@@ -1,10 +1,10 @@
-package br.com.budgets.viewmodel
+package br.com.budgets.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.budgets.data.AddressResponse
-import br.com.budgets.network.RetrofitInstance
-import br.com.budgets.network.ViaCepService
+import br.com.budgets.data.remote.dto.AddressResponse
+import br.com.budgets.data.remote.RetrofitInstance
+import br.com.budgets.data.remote.ViaCepService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package br.com.budgets
+package br.com.budgets.ui.screen
 
 import android.net.Uri
 import androidx.compose.foundation.layout.*
@@ -18,12 +18,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import br.com.budgets.data.Customer
-import br.com.budgets.data.CustomerAddress
-import br.com.budgets.data.Owner
-import br.com.budgets.data.OwnerAddress
-import br.com.budgets.data.OwnerDataStore
-import br.com.budgets.viewmodel.AddressViewModel
+import br.com.budgets.R
+import br.com.budgets.domain.model.Customer
+import br.com.budgets.domain.model.CustomerAddress
+import br.com.budgets.domain.model.Owner
+import br.com.budgets.domain.model.OwnerAddress
+import br.com.budgets.data.local.preferences.OwnerDataStore
+import br.com.budgets.ui.viewmodel.AddressViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

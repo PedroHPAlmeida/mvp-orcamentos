@@ -1,4 +1,4 @@
-package br.com.budgets
+package br.com.budgets.ui.screen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import br.com.budgets.R
 
 @Composable
 fun AddProductOrServiceModal(
@@ -29,7 +31,7 @@ fun AddProductOrServiceModal(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = stringResource(R.string.products_and_services), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+            Text(text = stringResource(R.string.products_and_services), fontWeight = FontWeight.Bold)
         },
         text = {
             Column(modifier = Modifier.padding(vertical = 8.dp)) {

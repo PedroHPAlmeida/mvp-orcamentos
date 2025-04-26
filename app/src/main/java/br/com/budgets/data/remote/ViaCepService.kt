@@ -1,6 +1,6 @@
-package br.com.budgets.network
+package br.com.budgets.data.remote
 
-import br.com.budgets.data.AddressResponse
+import br.com.budgets.data.remote.dto.AddressResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 

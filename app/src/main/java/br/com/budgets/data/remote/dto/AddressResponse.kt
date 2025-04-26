@@ -1,4 +1,4 @@
-package br.com.budgets.data
+package br.com.budgets.data.remote.dto
 
 import kotlinx.serialization.Serializable
 

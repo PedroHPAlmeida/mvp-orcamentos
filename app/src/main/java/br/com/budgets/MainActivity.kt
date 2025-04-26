@@ -12,8 +12,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import br.com.budgets.data.Customer
-import br.com.budgets.data.OwnerDataStore
+import br.com.budgets.domain.model.Customer
+import br.com.budgets.data.local.preferences.OwnerDataStore
+import br.com.budgets.ui.screen.BudgetViewScreen
+import br.com.budgets.ui.screen.HomeScreen
+import br.com.budgets.ui.screen.InitialRegistrationScreen
+import br.com.budgets.ui.screen.MyBudgetsScreen
+import br.com.budgets.ui.screen.NewBudgetScreen
 import br.com.budgets.ui.theme.BudgetsTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
