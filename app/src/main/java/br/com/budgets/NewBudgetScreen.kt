@@ -36,7 +36,7 @@ import kotlinx.serialization.json.Json
 @Composable
 fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
     var showAddProductOrServiceModal by remember { mutableStateOf(false) }
-    var productsAndServices by remember { mutableStateOf(listOf<Pair<String, String>>()) }
+    var productsAndServices by remember { mutableStateOf(listOf<Triple<String, String, Int>>()) }
     var customer by remember { mutableStateOf(initialCustomer) }
 
     Column(
@@ -58,9 +58,7 @@ fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
                 val customerJson = Json.encodeToString(customer)
                 navController.navigate(
                     "initial_registration?isFromNewBudgetScreen=true&customerJson=${
-                        Uri.encode(
-                            customerJson
-                        )
+                        Uri.encode(customerJson)
                     }"
                 )
             }, onDelete = { customer = null })
@@ -93,12 +91,31 @@ fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        productsAndServices.forEach { (name, value) ->
+        productsAndServices.forEach { (name, value, quantity) ->
             ProductServiceItem(
-                name = name, value = value, onDelete = {
-                    productsAndServices =
-                        productsAndServices.filter { it.first != name || it.second != value }
-                })
+                name = name,
+                value = value,
+                quantity = quantity,
+                onIncreaseQuantity = {
+                    productsAndServices = productsAndServices.map {
+                        if (it.first == name && it.second == value) {
+                            Triple(it.first, it.second, it.third + 1)
+                        } else it
+                    }
+                },
+                onDecreaseQuantity = {
+                    productsAndServices = productsAndServices.map {
+                        if (it.first == name && it.second == value && it.third > 1) {
+                            Triple(it.first, it.second, it.third - 1)
+                        } else it
+                    }
+                },
+                onDelete = {
+                    productsAndServices = productsAndServices.filter {
+                        it.first != name || it.second != value
+                    }
+                }
+            )
             Spacer(modifier = Modifier.height(4.dp))
         }
 
@@ -114,10 +131,13 @@ fun NewBudgetScreen(navController: NavController, initialCustomer: Customer?) {
         }
 
         if (showAddProductOrServiceModal) {
-            AddProductOrServiceModal(onConfirm = { name, value ->
-                productsAndServices = productsAndServices + (name to "R$ $value")
-                showAddProductOrServiceModal = false
-            }, onDismiss = { showAddProductOrServiceModal = false })
+            AddProductOrServiceModal(
+                onConfirm = { name, value ->
+                    productsAndServices = productsAndServices + Triple(name, "R$ $value", 1) // Quantidade inicial = 1
+                    showAddProductOrServiceModal = false
+                },
+                onDismiss = { showAddProductOrServiceModal = false }
+            )
         }
 
         HorizontalDivider(
@@ -279,8 +299,9 @@ fun DatePickerModal(
     }
 }
 
-fun calculateTotal(productsAndServices: List<Pair<String, String>>): String {
+fun calculateTotal(productsAndServices: List<Triple<String, String, Int>>): String {
     return productsAndServices.map {
-        it.second.replace("R$ ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
+        val unitValue = it.second.replace("R$ ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
+        unitValue * it.third // Multiplica pelo número de itens
     }.sum().let { String.format("%.2f", it) }
 }
