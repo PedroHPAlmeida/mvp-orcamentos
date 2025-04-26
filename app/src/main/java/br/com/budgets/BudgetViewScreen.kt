@@ -158,7 +158,15 @@ fun BudgetDetails(
                 } ?: "Endereço não definido"
             )
         } else {
-            Text(text = "Dados do dono não disponíveis", fontWeight = FontWeight.Bold)
+            Text(
+                text = stringResource(R.string.budget),
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth() // Faz o texto ocupar toda a largura
+                    .align(Alignment.CenterHorizontally) // Centraliza no eixo horizontal
+            )
+
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -199,7 +207,7 @@ fun BudgetDetails(
 
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "${stringResource(R.string.address)}: ",
+                text = "${stringResource(R.string.address)} ",
                 fontWeight = FontWeight.Bold
             )
             Text(text = clientAddress, fontWeight = FontWeight.Normal)

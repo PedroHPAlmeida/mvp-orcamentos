@@ -27,7 +27,7 @@
     <string name="confirm">Confirmar</string>
     <string name="skip">Pular</string>
     <string name="name">Nome:</string>
-    <string name="cpf_cnpj">Cpf/Cnpj:</string>
+    <string name="cpf_cnpj">CPF/CNPJ:</string>
     <string name="phone">Telefone:</string>
     <string name="email">E-mail:</string>
     <string name="address">Endereço:</string>
@@ -48,4 +48,5 @@
     <string name="house_number">Número:</string>
     <string name="complement">Complemento:</string>
     <string name="search">Buscar</string>
+    <string name="budget">ORÇAMENTO</string>
 </resources>
