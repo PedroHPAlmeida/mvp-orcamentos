@@ -12,8 +12,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import br.com.budgets.domain.model.Customer
 import br.com.budgets.data.local.preferences.OwnerDataStore
+import br.com.budgets.domain.model.Customer
+import br.com.budgets.ui.screen.AddCustomerScreen
 import br.com.budgets.ui.screen.BudgetViewScreen
 import br.com.budgets.ui.screen.HomeScreen
 import br.com.budgets.ui.screen.InitialRegistrationScreen
@@ -75,6 +76,20 @@ class MainActivity : ComponentActivity() {
                                 customer = customer
                             )
                         }
+                        composable(
+                            "add_customer?customerJson={customerJson}",
+                            arguments = listOf(navArgument("customerJson") {
+                                type = NavType.StringType
+                                defaultValue = ""
+                            })
+                        ) { backStackEntry ->
+                            val customerJson = backStackEntry.arguments?.getString("customerJson")
+                            var customer: Customer? = null
+                            if (customerJson != null && customerJson.isNotEmpty()) {
+                                customer = Json.decodeFromString<Customer>(customerJson)
+                            }
+                            AddCustomerScreen(navController, customer)
+                        }
                         composable("home") { HomeScreen(navController) }
                         composable(
                             "new_budget?customerJson={customerJson}", arguments = listOf(
@@ -98,17 +113,13 @@ class MainActivity : ComponentActivity() {
                         // Adicionando o destino para BudgetViewScreen
                         composable(
                             "budget_view?customer={customer}&services={services}",
-                            arguments = listOf(
-                                navArgument("customer") {
-                                    type = NavType.StringType
-                                    nullable = true
-                                },
-                                navArgument("services") {
-                                    type = NavType.StringType
-                                    nullable = true
-                                }
-                            )
-                        ) { backStackEntry ->
+                            arguments = listOf(navArgument("customer") {
+                                type = NavType.StringType
+                                nullable = true
+                            }, navArgument("services") {
+                                type = NavType.StringType
+                                nullable = true
+                            })) { backStackEntry ->
                             val customerJson = backStackEntry.arguments?.getString("customer")
                             val servicesJson = backStackEntry.arguments?.getString("services")
 
