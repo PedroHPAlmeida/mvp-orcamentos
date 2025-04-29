@@ -1,6 +1,7 @@
 package br.com.budgets.ui.screen
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,17 +34,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import br.com.budgets.R
+import br.com.budgets.data.local.room.entity.CustomerAddressEntity
+import br.com.budgets.data.local.room.entity.CustomerEntity
 import br.com.budgets.domain.model.Customer
 import br.com.budgets.domain.model.CustomerAddress
 import br.com.budgets.ui.viewmodel.AddressViewModel
+import br.com.budgets.ui.viewmodel.CustomerViewModel
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Composable
 fun AddCustomerScreen(
-    navController: NavController, customer: Customer? = null
+    navController: NavController, customer: Customer? = null, customerViewModel: CustomerViewModel
 ) {
     var name by remember { mutableStateOf("") }
     var cpfCnpj by remember { mutableStateOf("") }
@@ -58,6 +62,8 @@ fun AddCustomerScreen(
     var state by remember { mutableStateOf("") }
 
     val scrollState = rememberScrollState()
+
+    val customers by customerViewModel.customers.collectAsStateWithLifecycle()
 
     val viewModel = AddressViewModel()
     val address by viewModel.address.collectAsStateWithLifecycle()
@@ -230,25 +236,51 @@ fun AddCustomerScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedButton(
                     modifier = Modifier.weight(1f), onClick = {
-                        if (true) {
-                            val address = CustomerAddress(
-                                postalCode = cep,
-                                street = addressDetail,
-                                number = number,
-                                complement = complement,
-                                neighborhood = neighborhood,
-                                city = city,
-                                state = state
-                            )
-                            val customer = Json.encodeToString(
-                                Customer(
-                                    name, cpfCnpj, phone, email, address
+                        // TODO: understand the best to handle domain and data models
+                        val address = CustomerAddress(
+                            postalCode = cep,
+                            street = addressDetail,
+                            number = number,
+                            complement = complement,
+                            neighborhood = neighborhood,
+                            city = city,
+                            state = state
+                        )
+
+                        runBlocking {
+                            customerViewModel.addCustomer(
+                                CustomerEntity(
+                                    name = name,
+                                    cpfOrCnpj = cpfCnpj,
+                                    phone = phone,
+                                    email = email
+                                ),
+                                CustomerAddressEntity(
+                                    postalCode = cep,
+                                    street = addressDetail,
+                                    number = number,
+                                    complement = complement,
+                                    neighborhood = neighborhood,
+                                    city = city,
+                                    state = state
                                 )
                             )
-                            navController.navigate(
-                                "new_budget?customerJson=${Uri.encode(customer)}"
-                            )
                         }
+
+                        // TODO: remove this
+                        Log.d("======== Customers ========", customers.toString())
+                        customers.forEach {
+                            Log.d("======== Customer ========", it.toString())
+                        }
+
+                        val customer = Json.encodeToString(
+                            Customer(
+                                name, cpfCnpj, phone, email, address
+                            )
+                        )
+                        navController.navigate(
+                            "new_budget?customerJson=${Uri.encode(customer)}"
+                        )
                     }) {
                     Text(text = stringResource(R.string.save))
                 }
@@ -261,5 +293,5 @@ fun AddCustomerScreen(
 @Preview(showBackground = true)
 @Composable
 fun AddCustomerScreenPreview() {
-    AddCustomerScreen(navController = rememberNavController())
+//    AddCustomerScreen(navController = rememberNavController(), customerViewModel = CustomerViewModel())
 }

@@ -12,7 +12,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.room.Room
 import br.com.budgets.data.local.preferences.OwnerDataStore
+import br.com.budgets.data.local.room.AppDatabase
+import br.com.budgets.data.repository.CustomerRepository
 import br.com.budgets.domain.model.Customer
 import br.com.budgets.ui.screen.AddCustomerScreen
 import br.com.budgets.ui.screen.BudgetViewScreen
@@ -21,6 +24,7 @@ import br.com.budgets.ui.screen.InitialRegistrationScreen
 import br.com.budgets.ui.screen.MyBudgetsScreen
 import br.com.budgets.ui.screen.NewBudgetScreen
 import br.com.budgets.ui.theme.BudgetsTheme
+import br.com.budgets.ui.viewmodel.CustomerViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -31,6 +35,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val db = Room.databaseBuilder(
+            this, AppDatabase::class.java, "app-db"
+        ).build()
 
         // Verificar se há dados do dono salvos no DataStore
         val hasOwnerData = runBlocking(Dispatchers.IO) {
@@ -88,7 +96,11 @@ class MainActivity : ComponentActivity() {
                             if (customerJson != null && customerJson.isNotEmpty()) {
                                 customer = Json.decodeFromString<Customer>(customerJson)
                             }
-                            AddCustomerScreen(navController, customer)
+                            AddCustomerScreen(
+                                navController, customer, CustomerViewModel(
+                                    CustomerRepository(db.customerDao())
+                                )
+                            )
                         }
                         composable("home") { HomeScreen(navController) }
                         composable(
@@ -119,7 +131,8 @@ class MainActivity : ComponentActivity() {
                             }, navArgument("services") {
                                 type = NavType.StringType
                                 nullable = true
-                            })) { backStackEntry ->
+                            })
+                        ) { backStackEntry ->
                             val customerJson = backStackEntry.arguments?.getString("customer")
                             val servicesJson = backStackEntry.arguments?.getString("services")
 
