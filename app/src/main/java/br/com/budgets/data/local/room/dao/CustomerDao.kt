@@ -19,6 +19,7 @@ interface CustomerDao {
     @Query("SELECT * FROM customers")
     fun getAllCustomerAndAddressFlow(): Flow<List<CustomerAndAddressEntity>>
 
+    // TODO: understand the best conflict strategy for our use case
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertCustomer(customer: CustomerEntity): Long
 

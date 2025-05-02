@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CustomerAddress(
+    val id: Long = 0,
     val postalCode: String,
     val street: String,
     val number: String,

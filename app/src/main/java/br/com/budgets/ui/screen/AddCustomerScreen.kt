@@ -35,8 +35,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import br.com.budgets.R
-import br.com.budgets.data.local.room.entity.CustomerAddressEntity
-import br.com.budgets.data.local.room.entity.CustomerEntity
 import br.com.budgets.domain.model.Customer
 import br.com.budgets.domain.model.CustomerAddress
 import br.com.budgets.ui.viewmodel.AddressViewModel
@@ -246,25 +244,16 @@ fun AddCustomerScreen(
                             city = city,
                             state = state
                         )
+                        val customer = Customer(
+                            name = name,
+                            cpfOrCnpj = cpfCnpj,
+                            phone = phone,
+                            email = email,
+                            address = address
+                        )
 
                         runBlocking {
-                            customerViewModel.addCustomer(
-                                CustomerEntity(
-                                    name = name,
-                                    cpfOrCnpj = cpfCnpj,
-                                    phone = phone,
-                                    email = email
-                                ),
-                                CustomerAddressEntity(
-                                    postalCode = cep,
-                                    street = addressDetail,
-                                    number = number,
-                                    complement = complement,
-                                    neighborhood = neighborhood,
-                                    city = city,
-                                    state = state
-                                )
-                            )
+                            customerViewModel.addCustomer(customer, address)
                         }
 
                         // TODO: remove this
@@ -273,13 +262,9 @@ fun AddCustomerScreen(
                             Log.d("======== Customer ========", it.toString())
                         }
 
-                        val customer = Json.encodeToString(
-                            Customer(
-                                name, cpfCnpj, phone, email, address
-                            )
-                        )
+                        val customerJson = Json.encodeToString(customer)
                         navController.navigate(
-                            "new_budget?customerJson=${Uri.encode(customer)}"
+                            "new_budget?customerJson=${Uri.encode(customerJson)}"
                         )
                     }) {
                     Text(text = stringResource(R.string.save))

@@ -2,10 +2,11 @@ package br.com.budgets.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import br.com.budgets.data.local.room.entity.CustomerAddressEntity
 import br.com.budgets.data.local.room.entity.CustomerAndAddressEntity
 import br.com.budgets.data.local.room.entity.CustomerEntity
 import br.com.budgets.data.repository.CustomerRepository
+import br.com.budgets.domain.model.Customer
+import br.com.budgets.domain.model.CustomerAddress
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,8 +32,8 @@ class CustomerViewModel(private val repository: CustomerRepository) : ViewModel(
     }
 
     suspend fun addCustomer(
-        customer: CustomerEntity,
-        customerAddress: CustomerAddressEntity? = null
+        customer: Customer,
+        customerAddress: CustomerAddress? = null
     ) {
         repository.addCustomerAndAddress(customer, customerAddress)
     }

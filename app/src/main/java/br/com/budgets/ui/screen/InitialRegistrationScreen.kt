@@ -1,11 +1,31 @@
 package br.com.budgets.ui.screen
 
 import android.net.Uri
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,11 +39,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import br.com.budgets.R
+import br.com.budgets.data.local.preferences.OwnerDataStore
 import br.com.budgets.domain.model.Customer
 import br.com.budgets.domain.model.CustomerAddress
 import br.com.budgets.domain.model.Owner
 import br.com.budgets.domain.model.OwnerAddress
-import br.com.budgets.data.local.preferences.OwnerDataStore
 import br.com.budgets.ui.viewmodel.AddressViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -159,13 +179,14 @@ fun InitialRegistrationScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             // Campo de CEP com o botão ao lado
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+            ) {
                 OutlinedTextField(
                     modifier = Modifier.weight(3f),
                     value = cep,
                     onValueChange = { cep = it },
-                    label = { Text(stringResource(R.string.zip_code)) }
-                )
+                    label = { Text(stringResource(R.string.zip_code)) })
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedButton(
                     modifier = Modifier.weight(1f), // Ajustar o tamanho proporcional ao campo de CEP
@@ -173,11 +194,9 @@ fun InitialRegistrationScreen(
                         if (cep.isNotEmpty()) {
                             viewModel.fetchAddress(cep) // Buscar o endereço com base no CEP
                         }
-                    }
-                ) {
+                    }) {
                     Text(
-                        text = stringResource(R.string.search),
-                        fontSize = 12.sp
+                        text = stringResource(R.string.search), fontSize = 12.sp
                     )
                 }
             }
@@ -248,14 +267,12 @@ fun InitialRegistrationScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     OutlinedButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = { navController.navigateUp() }) {
+                        modifier = Modifier.weight(1f), onClick = { navController.navigateUp() }) {
                         Text(text = stringResource(R.string.cancel))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     OutlinedButton(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
+                        modifier = Modifier.weight(1f), onClick = {
                             if (isFromHomeScreen) {
                                 // Salvar os dados do dono no DataStore
                                 val owner = Owner(
@@ -296,7 +313,15 @@ fun InitialRegistrationScreen(
                                     city = city,
                                     state = state
                                 )
-                                val customer = Json.encodeToString(Customer(name, cpfCnpj, phone, email, address))
+                                val customer = Json.encodeToString(
+                                    Customer(
+                                        name = name,
+                                        cpfOrCnpj = cpfCnpj,
+                                        phone = phone,
+                                        email = email,
+                                        address = address
+                                    )
+                                )
                                 navController.navigate(
                                     "new_budget?customerJson=${Uri.encode(customer)}"
                                 )
@@ -307,8 +332,7 @@ fun InitialRegistrationScreen(
                 }
             } else {
                 OutlinedButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
+                    modifier = Modifier.fillMaxWidth(), onClick = {
                         val owner = Owner(
                             name = name,
                             cpfOrCnpj = cpfCnpj,
