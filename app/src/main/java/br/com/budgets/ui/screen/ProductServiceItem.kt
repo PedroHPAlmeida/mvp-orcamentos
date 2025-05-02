@@ -57,20 +57,39 @@ fun ProductServiceItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                // Botão de diminuir quantidade
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(50)) // Botão circular
-                        .background(MaterialTheme.colorScheme.primary) // Fundo do botão
-                        .clickable { onDecreaseQuantity() },
-                    contentAlignment = Alignment.Center // Centralizar o ícone
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Remove, // Ícone de "-"
-                        contentDescription = "Diminuir quantidade",
-                        tint = MaterialTheme.colorScheme.onPrimary // Garante visibilidade
-                    )
+                // Mostrar o ícone de lixeira se a quantidade for 1
+                if (quantity == 1) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(50)) // Botão circular
+                            .background(MaterialTheme.colorScheme.primary) // Fundo do botão
+                            .clickable { onDelete() }, // Excluir o item
+                        contentAlignment = Alignment.Center // Centralizar o ícone
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete, // Ícone de lixeira
+                            contentDescription = "Excluir item",
+                            tint = MaterialTheme.colorScheme.onPrimary // Garante visibilidade
+                        )
+                    }
+                }
+                // Mostrar o botão de diminuir quantidade se quantity > 1
+                else {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(50)) // Botão circular
+                            .background(MaterialTheme.colorScheme.primary) // Fundo do botão
+                            .clickable { onDecreaseQuantity() }, // Diminuir a quantidade
+                        contentAlignment = Alignment.Center // Centralizar o ícone
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Remove, // Ícone de "-"
+                            contentDescription = "Diminuir quantidade",
+                            tint = MaterialTheme.colorScheme.onPrimary // Garante visibilidade
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -89,7 +108,7 @@ fun ProductServiceItem(
                         .size(32.dp)
                         .clip(RoundedCornerShape(50)) // Botão circular
                         .background(MaterialTheme.colorScheme.primary) // Fundo do botão
-                        .clickable { onIncreaseQuantity() },
+                        .clickable { onIncreaseQuantity() }, // Aumentar a quantidade
                     contentAlignment = Alignment.Center // Centralizar o ícone
                 ) {
                     Icon(
@@ -99,15 +118,6 @@ fun ProductServiceItem(
                     )
                 }
             }
-
-            // Ícone de exclusão
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Excluir item",
-                modifier = Modifier
-                    .size(20.dp)
-                    .clickable { onDelete() }
-            )
         }
     }
 }
